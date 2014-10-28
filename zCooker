@@ -1,0 +1,228 @@
+package scripts;
+
+import java.util.Random;
+
+import org.tribot.api.Clicking;
+import org.tribot.api.DynamicClicking;
+import org.tribot.api.input.DynamicMouse;
+import org.tribot.api.input.Mouse;
+import org.tribot.api2007.Banking;
+import org.tribot.api2007.Game;
+import org.tribot.api2007.Inventory;
+import org.tribot.api2007.types.RSItem;
+import org.tribot.api2007.types.RSMenuNode;
+import org.tribot.api2007.types.RSPlayer;
+import org.tribot.api2007.types.RSTile;
+import org.tribot.script.Script;
+import org.tribot.script.ScriptManifest;
+
+import com.sun.org.glassfish.external.statistics.annotations.Reset;
+
+
+@ScriptManifest (authors = {"Z"}, category = "Test", name = "ZSwordCathCooker")
+// tribot docs: https://tribot.org/doc/index-files/index-1.html
+
+public class ZZCathCooker extends Script {
+	
+	 	
+	 private String fishToCookString; 
+	 private RSItem swordFish[];
+	 private RSItem tunaFish[];
+	 private RSItem lobsterFish[];
+	 private RSTile stoveTile = new RSTile(2817, 3444);
+	 private RSTile stoveTile_Two = new RSTile(2818, 3444);
+	 private RSTile currentTile;
+	 private RSTile bankTile = new RSTile(2811, 3441);
+	 private int cookingAnimation;
+	 private RSPlayer player;
+	 private RSMenuNode menu;
+	 //2811 , 3441
+	 private Random random = new Random();
+	 
+	 private int swordFishID = 371;
+	 private String swordFishStringID = "371";
+	 private int tunaFishID = 359;
+	 private String tunaFishStringID = "raw tuna";
+	 private int lobsterFishID = 377;
+	 private String lobsterFishStringID = "raw lobster";
+	 private int currentFishCookingID;
+	
+	 
+	
+	public void findFishInInventory() {
+		 swordFish = Inventory.find(swordFishID);
+		 tunaFish = Inventory.find(tunaFishID);
+		 lobsterFish = Inventory.find(lobsterFishID);
+		 
+		// if(Inventory.getCount(names)) {
+		//	 fishToCookString = "swordfish";
+		//	 println("inventory full of swordfish");
+		//	 println("going to cook ===>" + fishToCookString);
+		// }
+		 
+		 if(Inventory.getCount(tunaFishStringID) >= 1) {
+			 fishToCookString = "tuna";
+			 currentFishCookingID = tunaFishID;
+			 println("inventory full of tuna");
+			 println("going to cook ===>" + fishToCookString);
+		 }
+		 
+		 if(Inventory.getCount(lobsterFishStringID) >= 1) {
+			 fishToCookString = "lobster";
+			 currentFishCookingID = lobsterFishID;
+			 println("inventory full of lobster");
+			 println("going to cook ===>" + fishToCookString);
+		 }
+		 else {
+			 
+		 }
+		 
+		 
+		 
+		/* if(Inventory.getAll().equals(swordFish)) {
+			 fishToCookString = "swordfish";
+			 println("inventory full of swordfish");
+			 println("going to cook ===>" + fishToCookString);
+		 }
+		 if(Inventory.getAll().equals(tunaFish)) {
+			 fishToCookString = "tuna";
+			 println("inventory full of tuna fish");
+			 println("going to cook ===>" + fishToCookString);
+		 }
+		 if(Inventory.getAll().equals(lobsterFish)) {
+			 fishToCookString = "lobster";
+			 println("inventory full of lobsters");
+			 println("going to cook ===>" + fishToCookString);
+		 } */
+		 println(fishToCookString);
+	}
+	
+	public void clickSwordFish() {
+		if(fishToCookString == "swordfish") {		
+		    Clicking.click(swordFish);
+		
+		}
+		
+		if(fishToCookString == "tuna") {
+			Clicking.click(tunaFish);
+			
+		}
+		
+		if(fishToCookString == "lobster") {
+			Clicking.click(lobsterFish);
+			
+		}
+		
+	}
+	
+	public void clickRange() {
+		
+		stoveTile.hover();
+		
+		
+		Clicking.click(stoveTile);		
+		sleep(8000 + (random.nextInt(1000)));
+		Mouse.click((258 + (random.nextInt(3))), (407 + random.nextInt(3)), 3);
+		Mouse.move(259 + (random.nextInt(2)), 405 + (random.nextInt(2)));
+		cook();
+		sleep(2000 + random.nextInt(1000));
+		
+		
+	}
+	
+	public void clickRange_2() {
+		stoveTile_Two.hover();		
+		Clicking.click(stoveTile_Two);		
+		sleep(8000 + (random.nextInt(1000)));
+		Mouse.click((258 + (random.nextInt(3))), (407 + random.nextInt(3)), 3);
+		Mouse.move(259 + (random.nextInt(2)), 405 + (random.nextInt(2)));
+		cook();
+		sleep(2000 + random.nextInt(1000));
+		
+		
+		
+
+	}
+	
+	public void cook() {
+		if(Game.getUptext().contains("Cook")) {
+			Mouse.setSpeed((25 + (random.nextInt(10))));
+			Mouse.click((275 + random.nextInt(2)), (407 + (random.nextInt(2))), 3);
+			sleep(1000 + random.nextInt(1000));
+			Mouse.click((269 + random.nextInt(3)), (471 + random.nextInt(3)), 0);
+			Mouse.setSpeed(95 + (random.nextInt(5)));
+			//sleep(57500 + random.nextInt(5000));
+			sleep(10000 + random.nextInt(1500));
+			// add if statement to check count of fish in invy so you can set sleep time accordingly
+		}
+	}
+	
+	public void goToBank() {
+		
+		Banking.openBank();
+		
+		depositSwordFish();
+		
+		withdrawMoreFish();
+		
+		closeBank();
+		
+		sleep(1000 + random.nextInt(1000));
+		
+		if(Inventory.getAll().length < 1) {
+			println("OUT OF FISH");
+			fishToCookString = null;
+		}
+		if(Inventory.getAll().length > 0) {
+		run();
+		}
+	}
+	
+	public void depositSwordFish() {
+		Banking.depositAll();
+	}
+	
+	public void withdrawMoreFish() {
+		if(Banking.isInBank()) {
+		Banking.withdraw(28, currentFishCookingID);		
+		println("tried to withdraw");
+		}
+		
+	}
+	
+	public void closeBank() {
+		Banking.close();
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	@Override
+	public void run() {
+		//whereAreYou();
+		fishToCookString = "null";
+		sleep(1500 + random.nextInt(700));
+		
+		findFishInInventory();
+		
+		clickSwordFish();
+		
+		sleep(2000);
+		
+		clickRange();
+		
+		goToBank();		
+		
+	}
+
+}
